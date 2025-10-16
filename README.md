@@ -1,21 +1,17 @@
-# Projeto - Minerador de Hashes
+# Projeto - Minerador de Hashes em GPU
 
 Este projeto é um minerador de hashes em **C++** que simula um processo de **proof-of-work** similar ao usado na mineração de criptomoedas. O código permite a **busca de um hash válida** a partir de transações lidas de arquivos e a tentativa de encontrar um **nonce correto** para gerar um hash que atenda a um critério de dificuldade.
 
 No repositório tem três implementações prontas:
 
 - Um minerador **sequencial** de transações **síncronas**
-- Um gerador de **transações síncronas**, com 30 transações fixas.
-- Um gerador de **transações assíncronas**, com quantidade e intervalo de transações aleatórios.
+- Um gerador de **transações**, com 40 transações fixas.
 
-### Para executar o gerador de transações síncronas:
+### Para executar o gerador de transações:
 
 Se você estiver em um ambiente HPC, carregue os módulos
 
 ```cpp
-# Se estiver no SDumont
-module load gcc/12.4.0_sequana
-```
 
 Compile o código e gere o binário:
 
@@ -50,16 +46,9 @@ Hash: c96958b686b92597528f3666e56963b62194a4bdaa2ecee3329f4f6c47fb577c
 
 ```
 
-### Para o gerador de transações assíncronas, siga o mesmo processo com o código async_generator.cpp
-
 ### Para realizar a mineração sequêncial
 
 Garanta que os módulos estão carregados:
-
-```cpp
-# Se estiver no SDumont
-module load gcc/12.4.0_sequana
-```
 
 Compile o código e gere o binário:
 
@@ -72,12 +61,12 @@ Execute o binário via srun, o comando abaixo solicita ao slurm:
 - 1 CPU,
 - 1 tarefa por CPU,
 - por 20 minutos (tempo máximo disponível na fila sequana_cpu_dev),
-- salva o output em miner_seq_4_código_do_job
-- Executa o miner_seq com 4 zeros a esquerda
+- salva o output em miner_id_do_job
+- Executa o miner_seq com 3 zeros a esquerda
 
 ```cpp
-time srun   --partition=sequana_cpu_dev   --nodes=1   --ntasks-per-node=1   --time=00:20:00  --output=miner_seq_5_%j   .
-/miner_seq 4
+time srun   --partition=sequana_cpu_dev   --nodes=1   --ntasks-per-node=1   --time=00:20:00  --output=miner_%j   .
+/miner_seq 3
 ```
 
 Você deve ver algo parecido com:
@@ -98,74 +87,23 @@ Terá acesso aos recursos habilitados para uso com o seu login:
 
 ![image.png](imgs/image3.png)
 
-## **Critérios de Avaliação**
 
-### **Rubrica D**
 
-- Executa o código minerador síncrono, no cluster **Franky**
-- Com dificuldade **5 zeros**
-- Gera relatório com explicação, tempo de execução e recursos SLURM utilizados
+## **Entrega**
 
-### **Rubrica D+**
+A entrega deve incluir um **relatório técnico** descrevendo de forma clara:
 
-- Cumpre todos os requisitos da Rubrica D
-- Executa no cluster **SDumont**
-- Explica diferenças de execução, desempenho e configurações entre os ambientes
+* as **estratégias de otimização aplicadas** no código, justificando as escolhas de cada abordagem;
+* as **métricas de desempenho** utilizadas (tempo de execução, throughput, etc.);
+* os **ganhos de desempenho obtidos**, com evidências experimentais (gráficos, tabelas).
 
-### Rúbrica C
+O relatório deve refletir o raciocínio crítico sobre o impacto das otimizações no uso da GPU e a eficiência paralela alcançada.
 
-- Executa o código minerador **assíncrono**, no cluster **Franky**
-- Com dificuldade **5 zeros, com pelo menos 5 gerações diferentes de async_gen**
-- Gera relatório com explicação, tempos de execução e recursos SLURM utilizados
 
-### **Rubrica C+**
+| **Conceito** | **Critérios**                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **C**        | Executa o minerador com paralelismo em GPU, demonstran domínio de boas práticas como minimização de cópias entre CPU e GPU, uso eficiente de buffers, redução de acessos à memória global e implementação de uma heurística eficiente. O código deve atingir dificuldade 7 zeros e realizar a mineração em até **20 minutos** no **Cluster Franky**. |
+| **B**        | Executa o minerador com **dificuldade 7 zeros** aplicando **todas as otimizações da rúbrica C**. O experimento deve ser executado no **supercomputador Santos Dumont**, completando a mineração de todos os blocos em no máximo **15 minutos**.                                                                                        |
+| **A**        | Executa o minerador com **dificuldade 8 zeros**, aplicando **todas as otimizações da rúbrica C**. O experimento deve ser executado no **supercomputador Santos Dumont**, completando a mineração de todos os blocos em no máximo **1 hora**.                                                                                        |
 
-- Cumpre todos os requisitos da Rubrica C
-- Executa no cluster  **SDumont**
-- Explica diferenças de execução, desempenho e configurações entre os ambientes
-
-### **Rubrica B**
-
-- Executa o código minerador **assíncrono**, no cluster **SDumont**
-- Com dificuldade **6 zeros, com pelo menos 5 gerações diferentes de async_gen**
-- Usa pelo pelo menos uma estratégia de otimização **em CPU** (MPI e OpenMP) no código.
-- Gera relatório com explicação, tempos de execução e recursos SLURM utilizados
-- Explica diferenças de execução, desempenho e configurações entre os ambientes
-
-### **Rubrica B+**
-
-- Cumpre todos os requisitos da Rubrica B
-- Usa as duas estratégias de otimização, MPI e OpenMP
-
-### **Rubrica A**
-
-- Executa o código minerador **assíncrono**, no cluster **SDumont**
-- Com dificuldade **7 zeros, com pelo menos 5 gerações diferentes de async_gen**
-- Usa pelo pelo menos uma estratégia de otimização em **GPU** no código.
-- Gera relatório com explicação, tempos de execução e recursos SLURM utilizados
-- Explica diferenças de execução, desempenho e configurações entre os ambientes
-
-### **Rubrica A+**
-
-- Cumpre todos os requisitos da Rubrica A
-- Usa uma estratégia de otimização híbrida, partes do código paralelizado em CPU, partes do código em GPU.
-- Apresenta **análise comparativa** completa entre as estratégias de otimização, ambientes e arquiteturas.
-
-## **📌 Entregáveis**
-
-GitHub-Classroom contendo:
-
-- Implementações
-- Scripts SLURM utilizados
-- Evidências (prints, logs, etc..)
-- Relatório técnico contendo:
-    
-    - Explicação do funcionamento do código
-    
-    - Tempo de execução
-    
-    - Estratégias computacionais utilizadas (CPU/GPU, etc.)
-    
-    - Discussão sobre os recursos solicitados via SLURM
-    
-    - Comparação entre ambientes
+ 
