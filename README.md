@@ -5,24 +5,12 @@ Este projeto é um minerador de hashes em **C++** que simula um processo de **pr
 No repositório tem três implementações prontas:
 
 - Um minerador **sequencial** de transações **síncronas**
-- Um gerador de **transações**, com 40 transações fixas.
+- Um gerador de **transações**, com 30 transações fixas.
 
 ### Para executar o gerador de transações:
 
-Se você estiver em um ambiente HPC, carregue os módulos
-
 ```cpp
-
-Compile o código e gere o binário:
-
-```cpp
- g++ sync_generator.cpp -o sync_generator -lssl -lcrypto
-```
-
-Execute o binário:
-
-```cpp
-./sync_generator
+./generator
 ```
 
 Você deve ter uma saída parecida com essa:
@@ -53,27 +41,21 @@ Garanta que os módulos estão carregados:
 Compile o código e gere o binário:
 
 ```cpp
-g++ miner_sync_seq.cpp -o miner_sync_seq -lssl -lcrypto
+g++ miner.cpp -o miner
 ```
-
-Execute o binário via srun, o comando abaixo solicita ao slurm:
+No SDumont, o comando abaixo solicita pelo slurm:
 
 - 1 CPU,
 - 1 tarefa por CPU,
 - por 20 minutos (tempo máximo disponível na fila sequana_cpu_dev),
 - salva o output em miner_id_do_job
-- Executa o miner_seq com 3 zeros a esquerda
+- Executa o miner com 3 zeros a esquerda
 
 ```cpp
 time srun   --partition=sequana_cpu_dev   --nodes=1   --ntasks-per-node=1   --time=00:20:00  --output=miner_%j   .
-/miner_seq 3
+/miner 3
 ```
-
-Você deve ver algo parecido com:
-
-![image.png](imgs/image1.png)
-
-E dentro do arquivo de output:
+Dentro do arquivo de output você deve ver algo como:
 
 ![image.png](imgs/image2.png)
 
