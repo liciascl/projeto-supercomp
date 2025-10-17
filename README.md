@@ -1,5 +1,5 @@
 # Projeto - Minerador de Hashes em GPU
-
+# **Individual, data de entrega 14/Novembro**
 Este projeto é um minerador de hashes em **C++** que simula um processo de **proof-of-work** similar ao usado na mineração de criptomoedas. O código permite a **busca de um hash válida** a partir de transações lidas de arquivos e a tentativa de encontrar um **nonce correto** para gerar um hash que atenda a um critério de dificuldade.
 
 No repositório tem três implementações prontas:
